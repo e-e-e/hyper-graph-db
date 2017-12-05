@@ -26,14 +26,20 @@ function collect (stream, cb) {
   stream.once('end', cb.bind(null, null, res))
 }
 
-Graph.prototype.put = function (triples, callback) {
-  if (!triples) return callback(new Error('Must pass triple'))
-  let entries = (!triples.reduce) ? [triples] : triples
-  entries = entries.reduce((prev, triple) => {
-    return prev.concat(this.generateBatch(triple, 'put'))
-  }, [])
-  this.db.batch(entries, callback)
+function doAction (action) {
+  return function (triples, callback) {
+    if (!triples) return callback(new Error('Must pass triple'))
+    let entries = (!triples.reduce) ? [triples] : triples
+    entries = entries.reduce((prev, triple) => {
+      return prev.concat(this.generateBatch(triple, action || 'put'))
+    }, [])
+    // console.log('entries', entries)
+    this.db.batch(entries.reverse(), callback)
+  }
 }
+
+Graph.prototype.put = doAction('put')
+Graph.prototype.del = doAction('del')
 
 Graph.prototype.search = function (query, callback) {
   callback(new Error('not implemented'))
