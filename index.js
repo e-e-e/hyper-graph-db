@@ -9,11 +9,17 @@ Graph.prototype.get = function (triple, callback) {
   const stream = this.db.createDiffStream(utils.createQuery(triple))
   collect(stream, (err, results) => {
     if (err) return callback(err)
-    const filtered = results.reduce((prev, result) => {
-      if (result.type === 'put') {
-        prev.push(JSON.parse(result.value[0].toString()))
+    // could do this filtering we collect the stream
+    const deletions = results.reduce((p, v, i) => {
+      if (v.type === 'del') p[v.key] = i // delete upto this index
+      return p
+    }, {})
+    const filtered = results.reduce((p, v, i) => {
+      if (v.type !== 'put') return p
+      if (!deletions[v.key] || i > deletions[v.key]) {
+        p.push(JSON.parse(v.value[0].toString()))
       }
-      return prev
+      return p
     }, [])
     callback(null, filtered)
   })
@@ -31,9 +37,8 @@ function doAction (action) {
     if (!triples) return callback(new Error('Must pass triple'))
     let entries = (!triples.reduce) ? [triples] : triples
     entries = entries.reduce((prev, triple) => {
-      return prev.concat(this.generateBatch(triple, action || 'put'))
+      return prev.concat(this.generateBatch(triple, action))
     }, [])
-    // console.log('entries', entries)
     this.db.batch(entries.reverse(), callback)
   }
 }
