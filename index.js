@@ -1,13 +1,13 @@
 const utils = require('./lib/utils')
 
 function Graph (db, opts) {
-  this.db = db
   if (!(this instanceof Graph)) return new Graph(db, opts)
+  this.db = db
 }
 
 Graph.prototype.get = function (triple, callback) {
   const stream = this.db.createDiffStream(utils.createQuery(triple))
-  collect(stream, (err, results) => {
+  utils.collect(stream, (err, results) => {
     if (err) return callback(err)
     // could do this filtering we collect the stream
     const deletions = results.reduce((p, v, i) => {
@@ -23,13 +23,6 @@ Graph.prototype.get = function (triple, callback) {
     }, [])
     callback(null, filtered)
   })
-}
-
-function collect (stream, cb) {
-  var res = []
-  stream.on('data', res.push.bind(res))
-  stream.once('error', cb)
-  stream.once('end', cb.bind(null, null, res))
 }
 
 function doAction (action) {
