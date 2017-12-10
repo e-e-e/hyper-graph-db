@@ -7,7 +7,6 @@ const hyperdb = require('hyperdb')
 function ramStore (filename) {
    // filename will be one of: data, bitfield, tree, signatures, key, secret_key
    // the data file will contain all your data concattenated.
-
    // just store all files in ram by returning a random-access-memory instance
   return ram()
 }
@@ -99,7 +98,7 @@ describe('a basic triple store', function () {
          })
     })
 
-    xit('should return the triple through the getStream interface', function (done) {
+    it('should return the triple through the getStream interface', function (done) {
       var stream = db.getStream({ predicate: 'b' })
       stream.on('data', function (data) {
         expect(data).to.eql(triple)
@@ -107,7 +106,7 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should return the triple through the getStream interface with falsy params', function (done) {
+    it('should return the triple through the getStream interface with falsy params', function (done) {
       var stream = db.getStream({ subject: null, predicate: 'b', object: false })
       stream.on('data', function (data) {
         expect(data).to.eql(triple)
@@ -261,7 +260,7 @@ describe('a basic triple store', function () {
       })
     })
 
-    xit('should return both triples through the getStream interface', function (done) {
+    it('should return both triples through the getStream interface', function (done) {
       var triples = [triple1, triple2]
       var stream = db.getStream({ predicate: 'b' })
       stream.on('data', function (data) {
@@ -405,7 +404,7 @@ describe('a basic triple store', function () {
       })
     })
 
-    xit('should return both triples through the getStream interface', function (done) {
+    it('should return both triples through the getStream interface', function (done) {
       var triples = [triple1, triple2]
       var stream = db.getStream({ predicate: 'b' })
       stream.on('data', function (data) {
@@ -485,8 +484,9 @@ describe('a basic triple store', function () {
     })
 
     xit('should support reverse over streams', function (done) {
-      var triples = [triple2, triple1],
-        stream = db.getStream({ predicate: 'b', reverse: true })
+      var triples = [triple2, triple1]
+      var stream = db.getStream({ predicate: 'b', reverse: true })
+
       stream.on('data', function (data) {
         expect(data).to.eql(triples.shift())
       })
@@ -633,8 +633,8 @@ describe('generateBatch', function () {
     var ops = db.generateBatch(triple, 'del')
     expect(ops).to.have.property('length', 6)
     ops.forEach(function (op) {
-      expect(op).to.have.property('type', 'del')
-      expect(JSON.parse(op.value)).to.eql(triple)
+      expect(op).to.have.property('type', 'put')
+      expect(JSON.parse(op.value)).to.eql(null)
     })
   })
 })

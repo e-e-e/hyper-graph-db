@@ -1,29 +1,22 @@
 const utils = require('./lib/utils')
-
+const HyperdbDiffTransform = require('./lib/HyperdbDiffTransform')
 function Graph (db, opts) {
   if (!(this instanceof Graph)) return new Graph(db, opts)
   this.db = db
 }
 
-Graph.prototype.get = function (triple, callback) {
+Graph.prototype.getStream = function (triple) {
   const stream = this.db.createDiffStream(utils.createQuery(triple))
-  utils.collect(stream, (err, results) => {
-    if (err) return callback(err)
-    // could do this filtering we collect the stream
-    const deletions = results.reduce((p, v, i) => {
-      if (v.type === 'del') p[v.key] = i // delete upto this index
-      return p
-    }, {})
-    const filtered = results.reduce((p, v, i) => {
-      if (v.type !== 'put') return p
-      if (!deletions[v.key] || i > deletions[v.key]) {
-        p.push(JSON.parse(v.value[0].toString()))
-      }
-      return p
-    }, [])
-    callback(null, filtered)
-  })
+  return stream.pipe(new HyperdbDiffTransform(this.db))
 }
+
+Graph.prototype.get = function (triple, callback) {
+  utils.collect(this.getStream(triple), callback)
+}
+
+// this is not implemented in hyperdb yet
+// for now we just put a null value in the db
+Graph.prototype.del = doAction('del')
 
 function doAction (action) {
   return function (triples, callback) {
@@ -37,7 +30,9 @@ function doAction (action) {
 }
 
 Graph.prototype.put = doAction('put')
-Graph.prototype.del = doAction('del')
+
+Graph.prototype.putStream = function (triple) {
+}
 
 Graph.prototype.search = function (query, callback) {
   callback(new Error('not implemented'))
