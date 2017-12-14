@@ -1,0 +1,41 @@
+module.exports = [{
+  subject: 'matteo',
+  predicate: 'friend',
+  object: 'daniele'
+}, {
+  subject: 'daniele',
+  predicate: 'friend',
+  object: 'matteo'
+}, {
+  subject: 'daniele',
+  predicate: 'friend',
+  object: 'marco'
+}, {
+  subject: 'lucio',
+  predicate: 'friend',
+  object: 'matteo'
+}, {
+  subject: 'lucio',
+  predicate: 'friend',
+  object: 'marco'
+}, {
+  subject: 'marco',
+  predicate: 'friend',
+  object: 'davide'
+}, {
+  subject: 'marco',
+  predicate: 'age',
+  object: 32
+}, {
+  subject: 'daniele',
+  predicate: 'age',
+  object: 25
+}, {
+  subject: 'lucio',
+  predicate: 'age',
+  object: 15
+}, {
+  subject: 'davide',
+  predicate: 'age',
+  object: 70
+}];

@@ -1,7 +1,7 @@
 /* eslint-env mocha */
-var ram = require('random-access-memory')
-const hypergraph = require('../index')
 const expect = require('chai').expect
+const ram = require('random-access-memory')
+const hypergraph = require('../index')
 const hyperdb = require('hyperdb')
 
 function ramStore (filename) {
