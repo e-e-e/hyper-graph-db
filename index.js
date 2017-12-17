@@ -4,7 +4,8 @@ const pump = require('pump')
 const utils = require('./lib/utils')
 const Variable = require('./lib/Variable')
 const HyperdbDiffTransform = require('./lib/HyperdbDiffTransform')
-const planner = require('./lib/queryPlanner')
+const JoinStream = require('./lib/JoinStream')
+const planner = require('./lib/planner')
 
 function Graph (db, opts) {
   if (!(this instanceof Graph)) return new Graph(db, opts)
@@ -54,8 +55,7 @@ Graph.prototype.searchStream = function (query, options) {
   const plannedQuery = planner(query)
 
   var streams = plannedQuery.map((triple) => {
-    const stream = triple.stream
-    return stream({ triple: utils.filterTriple(triple), db: this, index: triple.index })
+    return new JoinStream({ triple, db: this })
   })
 
   streams[0].start = true

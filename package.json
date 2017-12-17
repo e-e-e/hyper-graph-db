@@ -15,8 +15,8 @@
     "standard": "^10.0.3"
   },
   "scripts": {
-    "test": "mocha test",
-    "ttd": "mocha test -w"
+    "test": "mocha test/**.spec.js",
+    "ttd": "mocha test/**.spec.js -w"
   },
   "author": "Benjamin Forster",
   "license": "MIT"
