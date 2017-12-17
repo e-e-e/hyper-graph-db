@@ -1,5 +1,7 @@
 # hyper-graph-db
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/e-e-e/hyper-graph-db.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/e-e-e/hyper-graph-db.svg?branch=master)](https://travis-ci.org/e-e-e/hyper-graph-db) [![Coverage Status](https://coveralls.io/repos/github/e-e-e/hyper-graph-db/badge.svg?branch=master)](https://coveralls.io/github/e-e-e/hyper-graph-db?branch=master)
 
 hyper-graph-db is a graph database on top of [hyperdb](https://github.com/mafintosh/hyperdb). It interface and test specs have been adapted from [LevelGraph](https://github.com/levelgraph/levelgraph).
