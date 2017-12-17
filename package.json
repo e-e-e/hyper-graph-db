@@ -1,8 +1,15 @@
 {
   "name": "hyper-graph-db",
   "version": "0.0.1",
-  "description": "",
+  "description": "A distributed graph database built upon hyperdb.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/e-e-e/hyper-graph-db.git"
+  },
+  "bugs": {
+    "url": "https://github.com/e-e-e/hyper-graph-db/issues"
+  },
   "dependencies": {
     "hyperdb": "^2.0.0",
     "readable-stream": "^2.3.3",
