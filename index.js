@@ -23,10 +23,6 @@ Graph.prototype.get = function (triple, callback) {
   utils.collect(this.getStream(triple), callback)
 }
 
-// this is not implemented in hyperdb yet
-// for now we just put a null value in the db
-Graph.prototype.del = doAction('del')
-
 function doAction (action) {
   return function (triples, callback) {
     if (!triples) return callback(new Error('Must pass triple'))
@@ -38,10 +34,13 @@ function doAction (action) {
   }
 }
 
+// this is not implemented in hyperdb yet
+// for now we just put a null value in the db
+Graph.prototype.del = doAction('del')
+
 Graph.prototype.put = doAction('put')
 
-Graph.prototype.putStream = function (triple) {
-}
+Graph.prototype.putStream = function (triple) { }
 
 Graph.prototype.searchStream = function (query, options) {
   const result = new PassThrough({ objectMode: true })

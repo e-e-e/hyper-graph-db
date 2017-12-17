@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - 6
+  - 7
+  - 8
+  - 9
+script:
+  - npm run travis
+after_script:
+  - npm run report-coverage

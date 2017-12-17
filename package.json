@@ -1,22 +1,26 @@
 {
-  "name": "hyperdb-graph",
+  "name": "hyper-graph-db",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "hyperdb": "^1.5.0",
-    "readable-stream": "^2.3.3"
+    "hyperdb": "^2.0.0",
+    "readable-stream": "^2.3.3",
+    "pump": "^2.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
-    "pump": "^2.0.0",
     "random-access-memory": "^2.4.0",
     "standard": "^10.0.3"
   },
   "scripts": {
     "test": "mocha test/**.spec.js",
-    "ttd": "mocha test/**.spec.js -w"
+    "tdd": "mocha test/**.spec.js -w",
+    "travis": "NODE_ENV=test istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls"
   },
   "author": "Benjamin Forster",
   "license": "MIT"
