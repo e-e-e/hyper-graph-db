@@ -44,7 +44,7 @@ Inserts **Hexastore** formated entries for triple into the graph database.
 
 #### `var stream = db.putStream(triple)`
 
-Returns a writable stream. **This is not yet implemented!**
+Returns a writable stream.
 
 #### `db.get(triple, [callback])`
 
@@ -56,7 +56,7 @@ Remove triples indices from the graph database.
 
 #### `var stream = db.delStream(triple)`
 
-Returns a writable stream for removing entries. **This is not yet implemented!**
+Returns a writable stream for removing entries.
 
 #### `var stream = db.getStream(triple)`
 

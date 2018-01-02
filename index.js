@@ -1,4 +1,5 @@
 const PassThrough = require('readable-stream').PassThrough
+const Transform = require('readable-stream').Transform
 const pump = require('pump')
 
 const utils = require('./lib/utils')
@@ -34,13 +35,34 @@ function doAction (action) {
   }
 }
 
+function doActionStream (action) {
+  return function () {
+    const transform = new Transform({
+      objectMode: true,
+      transform (triples, encoding, done) {
+        if (!triples) return done()
+        let entries = (!triples.reduce) ? [triples] : triples
+        entries = entries.reduce((prev, triple) => {
+          return prev.concat(utils.generateBatch(triple, action))
+        }, [])
+        this.push(entries.reverse())
+        done()
+      }
+    })
+    const writeStream = this.db.createWriteStream()
+    transform.pipe(writeStream)
+    return transform
+  }
+}
+
 // this is not implemented in hyperdb yet
 // for now we just put a null value in the db
-Graph.prototype.del = doAction('del')
 
 Graph.prototype.put = doAction('put')
+Graph.prototype.putStream = doActionStream('put')
 
-Graph.prototype.putStream = function (triple) { }
+Graph.prototype.del = doAction('del')
+Graph.prototype.delStream = doActionStream('del')
 
 Graph.prototype.searchStream = function (query, options) {
   const result = new PassThrough({ objectMode: true })

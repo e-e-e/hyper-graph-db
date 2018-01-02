@@ -514,17 +514,17 @@ describe('a basic triple store', function () {
     }
   })
 
-  xit('should put triples using a stream', function (done) {
+  it('should put triples using a stream', function (done) {
     var t1 = { subject: 'a', predicate: 'b', object: 'c' }
     var t2 = { subject: 'a', predicate: 'b', object: 'd' }
     var stream = db.putStream()
-    stream.on('close', done)
+    stream.on('end', done)
 
     stream.write(t1)
     stream.end(t2)
   })
 
-  xit('should store the triples written using a stream', function (done) {
+  it('should store the triples written using a stream', function (done) {
     var t1 = { subject: 'a', predicate: 'b', object: 'c' }
     var t2 = { subject: 'a', predicate: 'b', object: 'd' }
     var stream = db.putStream()
@@ -532,7 +532,7 @@ describe('a basic triple store', function () {
     stream.write(t1)
     stream.end(t2)
 
-    stream.on('close', function () {
+    stream.on('end', function () {
       var triples = [t1, t2]
       var readStream = db.getStream({ predicate: 'b' })
 
@@ -544,7 +544,7 @@ describe('a basic triple store', function () {
     })
   })
 
-  xit('should del the triples using a stream', function (done) {
+  it('should del the triples using a stream', function (done) {
     var t1 = { subject: 'a', predicate: 'b', object: 'c' }
     var t2 = { subject: 'a', predicate: 'b', object: 'd' }
     var stream = db.putStream()
@@ -552,12 +552,12 @@ describe('a basic triple store', function () {
     stream.write(t1)
     stream.end(t2)
 
-    stream.on('close', function () {
+    stream.on('end', function () {
       var delStream = db.delStream()
       delStream.write(t1)
       delStream.end(t2)
 
-      delStream.on('close', function () {
+      delStream.on('end', function () {
         var readStream = db.getStream({ predicate: 'b' })
 
         var results = []
