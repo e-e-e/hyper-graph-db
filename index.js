@@ -15,13 +15,14 @@ function Graph (db, opts) {
 
 Graph.prototype.v = (name) => new Variable(name)
 
-Graph.prototype.getStream = function (triple) {
-  const stream = this.db.createDiffStream(utils.createQuery(triple))
-  return stream.pipe(new HyperdbDiffTransform(this.db))
+Graph.prototype.getStream = function (triple, opts) {
+  const stream = this.db.createReadStream(utils.createQuery(triple))
+  return stream.pipe(new HyperdbDiffTransform(this.db, opts))
 }
 
-Graph.prototype.get = function (triple, callback) {
-  utils.collect(this.getStream(triple), callback)
+Graph.prototype.get = function (triple, opts, callback) {
+  if (typeof opts === 'function') return this.get(triple, undefined, opts)
+  utils.collect(this.getStream(triple, opts), callback)
 }
 
 function doAction (action) {
