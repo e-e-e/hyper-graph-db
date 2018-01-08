@@ -76,8 +76,14 @@ Graph.prototype.searchStream = function (query, options) {
   }
   const plannedQuery = planner(query)
 
-  var streams = plannedQuery.map((triple) => {
-    return new JoinStream({ triple, db: this })
+  var streams = plannedQuery.map((triple, i) => {
+    const limit = (options && i === plannedQuery.length - 1) ? options.limit : undefined
+    return new JoinStream({
+      triple: utils.filterTriple(triple),
+      filter: triple.filter,
+      db: this,
+      limit
+    })
   })
 
   streams[0].start = true
@@ -88,8 +94,12 @@ Graph.prototype.searchStream = function (query, options) {
   return result
 }
 
-Graph.prototype.search = function (query, callback) {
-  utils.collect(this.searchStream(query), callback)
+Graph.prototype.search = function (query, options, callback) {
+  if (typeof options === 'function') {
+    callback = options
+    options = undefined
+  }
+  utils.collect(this.searchStream(query, options), callback)
 }
 
 Graph.prototype.generateBatch = utils.generateBatch
