@@ -46,9 +46,18 @@ Inserts **Hexastore** formated entries for triple into the graph database.
 
 Returns a writable stream.
 
-#### `db.get(triple, [callback])`
+#### `db.get(triple, [options], callback)`
 
 Returns all entries that match the triple. This allows for partial  pattern-matching. For example `{ subject: 'a' })`, will return all triples with subject equal to 'a'.
+
+Allowed options:
+```js
+{
+  limit: number, // limit number of triples returned
+  offset: number, // offset returned
+  filter: function (triple) { return bool }, // filter the results
+}
+```
 
 #### `db.del(triple, [callback])`
 
@@ -58,13 +67,41 @@ Remove triples indices from the graph database.
 
 Returns a writable stream for removing entries.
 
-#### `var stream = db.getStream(triple)`
+#### `var stream = db.getStream(triple, [options])`
 
 Returns a readable stream of all matching triples.
 
-#### `db.search(queries, [callback])`
+Allowed options:
+```js
+{
+  limit: number, // limit number of triples returned
+  offset: number, // offset returned
+  filter: function (triple) { return bool }, // filter the results
+}
+```
+
+#### `db.search(queries, [options], callback)`
 
 Allows for Basic Graph Patterns searches where all queries must match.
+Expects queries to be an array of triple options of the form:
+
+```js
+{
+  subject: String || Variable, // required
+  predicate: String || Variable, // required
+  object: String || Variable, // required
+  filter: Function, // optional
+}
+```
+
+Allowed options:
+```js
+{
+  limit: number, // limit number of results returned
+}
+```
+
+filter: function (triple) { return bool },
 
 ```js
 db.put([{
