@@ -1,0 +1,10 @@
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#> 
+PREFIX sn: <http://www.snee.com/hr/> 
+
+SELECT ?givenName ?familyName ?oDate
+WHERE 
+{ 
+   ?person vcard:given-name ?givenName .
+   ?person vcard:family-name ?familyName . 
+   OPTIONAL { ?person sn:completedOrientation  ?oDate . }
+}

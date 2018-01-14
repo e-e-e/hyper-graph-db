@@ -1,0 +1,16 @@
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#> 
+PREFIX sn: <http://www.snee.com/hr/> 
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+CONSTRUCT { 
+  ?person rdf:type foaf:Person . 
+  ?person foaf:givenName ?givenName .
+  ?person foaf:familyName ?familyName .
+  ?person foaf:name ?fullName .
+}
+WHERE { 
+  ?person vcard:given-name ?givenName .  
+  ?person vcard:family-name ?familyName .
+  BIND(concat(?givenName," ",?familyName) AS ?fullName) 
+}
