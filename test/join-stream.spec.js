@@ -115,7 +115,6 @@ describe('JoinStream', () => {
     }])
 
     stream.on('data', (data) => {
-      console.log('data-', data)
       var solutionIndex = -1
 
       solutions.forEach((solution, i) => {
