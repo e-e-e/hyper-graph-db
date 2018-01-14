@@ -1,6 +1,6 @@
 {
   "name": "hyper-graph-db",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A distributed graph database built upon hyperdb.",
   "main": "index.js",
   "repository": {
@@ -12,8 +12,9 @@
   },
   "dependencies": {
     "hyperdb": "^2.0.0",
-    "readable-stream": "^2.3.3",
-    "pump": "^2.0.0"
+    "lru": "^3.1.0",
+    "pump": "^2.0.0",
+    "readable-stream": "^2.3.3"
   },
   "devDependencies": {
     "chai": "^4.1.2",

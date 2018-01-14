@@ -3,7 +3,6 @@
 const expect = require('chai').expect
 const ram = require('random-access-memory')
 const hypergraph = require('../index')
-const hyperdb = require('hyperdb')
 const fixture = require('./fixture/foaf')
 
 function ramStore (filename) {
@@ -16,7 +15,7 @@ function ramStore (filename) {
 describe('JoinStream', () => {
   let db
   beforeEach((done) => {
-    db = hypergraph(hyperdb(ramStore))
+    db = hypergraph(ramStore)
     db.put(fixture, done)
   })
 
@@ -116,7 +115,6 @@ describe('JoinStream', () => {
     }])
 
     stream.on('data', (data) => {
-      console.log('data-', data)
       var solutionIndex = -1
 
       solutions.forEach((solution, i) => {
@@ -281,7 +279,7 @@ describe('JoinStream', () => {
     })
   })
 
-  xit('should support filtering inside a condition', (done) => {
+  it('should support filtering inside a condition', (done) => {
     db.search([{
       subject: db.v('x'),
       predicate: 'friend',
@@ -293,7 +291,7 @@ describe('JoinStream', () => {
     })
   })
 
-  xit('should support filtering inside a second-level condition', (done) => {
+  it('should support filtering inside a second-level condition', (done) => {
     db.search([{
       subject: 'matteo',
       predicate: 'friend',
@@ -365,7 +363,7 @@ describe('JoinStream', () => {
     })
   })
 
-  xit('should return only one solution with limit 1', (done) => {
+  it('should return only one solution with limit 1', (done) => {
     db.search([{
       subject: db.v('x'),
       predicate: 'friend',
@@ -381,7 +379,7 @@ describe('JoinStream', () => {
     })
   })
 
-  xit('should return only one solution with limit 1 (bis)', (done) => {
+  it('should return only one solution with limit 1 (bis)', (done) => {
     db.search([{
       subject: 'lucio',
       predicate: 'friend',
@@ -392,7 +390,7 @@ describe('JoinStream', () => {
       object: db.v('x')
     }], { limit: 1 }, (err, results) => {
       expect(results).to.have.property('length', 1)
-      expect(results[0]).to.have.property('x', 'marco')
+      expect(results[0]).to.have.property('x', 'matteo')
       done(err)
     })
   })

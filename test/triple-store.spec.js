@@ -2,7 +2,6 @@
 const expect = require('chai').expect
 const ram = require('random-access-memory')
 const hypergraph = require('../index')
-const hyperdb = require('hyperdb')
 
 function ramStore (filename) {
    // filename will be one of: data, bitfield, tree, signatures, key, secret_key
@@ -13,11 +12,9 @@ function ramStore (filename) {
 
 describe('a basic triple store', function () {
   let db
-  let hyper
 
   beforeEach(function () {
-    hyper = hyperdb(ramStore)
-    db = hypergraph(hyper)
+    db = hypergraph(ramStore)
   })
 
   afterEach(function (done) {
@@ -114,29 +111,29 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should get the triple if limit 1 is used', function (done) {
-      db.get({ limit: 1 }, (err, list) => {
+    it('should get the triple if limit 1 is used', function (done) {
+      db.get({}, { limit: 1 }, (err, list) => {
         expect(list).to.eql([triple])
         done(err)
       })
     })
 
-    xit('should get the triple if limit 0 is used', function (done) {
-      db.get({ limit: 0 }, (err, list) => {
+    it('should get the triple if limit 0 is used', function (done) {
+      db.get({}, { limit: 0 }, (err, list) => {
         expect(list).to.eql([triple])
         done(err)
       })
     })
 
-    xit('should get the triple if offset 0 is used', function (done) {
-      db.get({ offset: 0 }, (err, list) => {
+    it('should get the triple if offset 0 is used', function (done) {
+      db.get({}, { offset: 0 }, (err, list) => {
         expect(list).to.eql([triple])
         done(err)
       })
     })
 
-    xit('should not get the triple if offset 1 is used', function (done) {
-      db.get({ offset: 1 }, (err, list) => {
+    it('should not get the triple if offset 1 is used', function (done) {
+      db.get({}, { offset: 1 }, (err, list) => {
         expect(list).to.eql([])
         done(err)
       })
@@ -209,7 +206,8 @@ describe('a basic triple store', function () {
   it('should put a triple with an object to false', function (done) {
     var t = { subject: 'a', predicate: 'b', object: false }
     db.put(t, function () {
-      hyper.get('spo::a::b::false', done)
+      // accessing underlying db instance
+      db.db.get('spo/a/b/false', done)
     })
   })
 
@@ -270,30 +268,30 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should return only one triple with limit 1', function (done) {
-      db.get({ predicate: 'b', limit: 1 }, (err, list) => {
+    it('should return only one triple with limit 1', function (done) {
+      db.get({ predicate: 'b' }, { limit: 1 }, (err, list) => {
         expect(list).to.eql([triple1])
         done(err)
       })
     })
 
-    xit('should return two triples with limit 2', function (done) {
-      db.get({ predicate: 'b', limit: 2 }, (err, list) => {
+    it('should return two triples with limit 2', function (done) {
+      db.get({ predicate: 'b' }, { limit: 2 }, (err, list) => {
         expect(list).to.eql([triple1, triple2])
         done(err)
       })
     })
 
-    xit('should return three triples with limit 3', function (done) {
-      db.get({ predicate: 'b', limit: 3 }, (err, list) => {
+    it('should return three triples with limit 3', function (done) {
+      db.get({ predicate: 'b' }, { limit: 3 }, (err, list) => {
         expect(list).to.eql([triple1, triple2])
         done(err)
       })
     })
 
-    xit('should support limit over streams', function (done) {
+    it('should support limit over streams', function (done) {
       var triples = [triple1]
-      var stream = db.getStream({ predicate: 'b', limit: 1 })
+      var stream = db.getStream({ predicate: 'b' }, { limit: 1 })
       stream.on('data', function (data) {
         expect(data).to.eql(triples.shift())
       })
@@ -301,23 +299,23 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should return only one triple with offset 1', function (done) {
-      db.get({ predicate: 'b', offset: 1 }, (err, list) => {
+    it('should return only one triple with offset 1', function (done) {
+      db.get({ predicate: 'b' }, { offset: 1 }, (err, list) => {
         expect(list).to.eql([triple2])
         done(err)
       })
     })
 
-    xit('should return only no triples with offset 2', function (done) {
-      db.get({ predicate: 'b', offset: 2 }, (err, list) => {
+    it('should return only no triples with offset 2', function (done) {
+      db.get({ predicate: 'b' }, { offset: 2 }, (err, list) => {
         expect(list).to.eql([])
         done(err)
       })
     })
 
-    xit('should support offset over streams', function (done) {
+    it('should support offset over streams', function (done) {
       var triples = [triple2]
-      var stream = db.getStream({ predicate: 'b', offset: 1 })
+      var stream = db.getStream({ predicate: 'b' }, { offset: 1 })
       stream.on('data', function (data) {
         expect(data).to.eql(triples.shift())
       })
@@ -414,30 +412,30 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should return only one triple with limit 1', function (done) {
-      db.get({ predicate: 'b', limit: 1 }, (err, list) => {
+    it('should return only one triple with limit 1', function (done) {
+      db.get({ predicate: 'b' }, { limit: 1 }, (err, list) => {
         expect(list).to.eql([triple1])
         done(err)
       })
     })
 
-    xit('should return two triples with limit 2', function (done) {
-      db.get({ predicate: 'b', limit: 2 }, (err, list) => {
+    it('should return two triples with limit 2', function (done) {
+      db.get({ predicate: 'b' }, { limit: 2 }, (err, list) => {
         expect(list).to.eql([triple1, triple2])
         done(err)
       })
     })
 
-    xit('should return three triples with limit 3', function (done) {
-      db.get({ predicate: 'b', limit: 3 }, (err, list) => {
+    it('should return three triples with limit 3', function (done) {
+      db.get({ predicate: 'b' }, { limit: 3 }, (err, list) => {
         expect(list).to.eql([triple1, triple2])
         done(err)
       })
     })
 
-    xit('should support limit over streams', function (done) {
+    it('should support limit over streams', function (done) {
       var triples = [triple1]
-      var stream = db.getStream({ predicate: 'b', limit: 1 })
+      var stream = db.getStream({ predicate: 'b' }, { limit: 1 })
       stream.on('data', function (data) {
         expect(data).to.eql(triples.shift())
       })
@@ -445,23 +443,23 @@ describe('a basic triple store', function () {
       stream.on('end', done)
     })
 
-    xit('should return only one triple with offset 1', function (done) {
-      db.get({ predicate: 'b', offset: 1 }, (err, list) => {
+    it('should return only one triple with offset 1', function (done) {
+      db.get({ predicate: 'b' }, { offset: 1 }, (err, list) => {
         expect(list).to.eql([triple2])
         done(err)
       })
     })
 
-    xit('should return only no triples with offset 2', function (done) {
-      db.get({ predicate: 'b', offset: 2 }, (err, list) => {
+    it('should return only no triples with offset 2', function (done) {
+      db.get({ predicate: 'b' }, { offset: 2 }, (err, list) => {
         expect(list).to.eql([])
         done(err)
       })
     })
 
-    xit('should support offset over streams', function (done) {
+    it('should support offset over streams', function (done) {
       var triples = [triple2]
-      var stream = db.getStream({ predicate: 'b', offset: 1 })
+      var stream = db.getStream({ predicate: 'b' }, { offset: 1 })
       stream.on('data', function (data) {
         expect(data).to.eql(triples.shift())
       })
@@ -573,7 +571,7 @@ describe('a basic triple store', function () {
     })
   })
 
-  xit('should support filtering', function (done) {
+  it('should support filtering', function (done) {
     var triple1 = { subject: 'a', predicate: 'b', object: 'd' }
     var triple2 = { subject: 'a', predicate: 'b', object: 'c' }
 
@@ -582,7 +580,7 @@ describe('a basic triple store', function () {
         return triple.object === 'd'
       }
 
-      db.get({ subject: 'a', predicate: 'b', filter: filter }, (err, results) => {
+      db.get({ subject: 'a', predicate: 'b' }, { filter: filter }, (err, results) => {
         expect(results).to.eql([triple1])
         done(err)
       })
@@ -598,7 +596,7 @@ describe('deferred open support', function () {
   })
 
   it('should support deferred search', function (done) {
-    db = hypergraph(hyperdb(ramStore))
+    db = hypergraph(ramStore)
     db.search([{ predicate: 'likes' }], function () {
       done()
     })
@@ -607,11 +605,9 @@ describe('deferred open support', function () {
 
 describe('generateBatch', function () {
   var db
-  var hyper
 
   beforeEach(function () {
-    hyper = hyperdb(ramStore)
-    db = hypergraph(hyper)
+    db = hypergraph(ramStore)
   })
 
   afterEach(function (done) {
