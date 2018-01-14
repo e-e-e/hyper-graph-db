@@ -17,10 +17,9 @@ This requires node v6.x.x or greater.
 ## basic usage
 
 ```js
-var hyperdb = require('hyperdb')
 var hypergraph = require('hyper-graph-db')
 
-var db = hypergraph(hyperdb('./my.db', {valueEncoding: 'utf-8'}))
+var db = hypergraph('./my.db', { valueEncoding: 'utf-8' })
 
 var triple = { subject: 'a', predicate: 'b', object: 'c' }
 
@@ -34,9 +33,23 @@ db.put(triple, function (err) {
 
 ## API
 
-#### `var db = hypergraph(hyperdb)`
+#### `var db = hypergraph(storage, [key], [options])`
 
-Returns an instance of hyper-graph-db using the hyperdb passed to it.
+Returns an instance of hyper-graph-db. Arguments are passed directly to hyperdb, look at its constructor [API](https://github.com/mafintosh/hyperdb#var-db--hyperdbstorage-key-options) for configuration options.
+
+
+#### `db.on('ready')`
+
+*This event is passed on from underlying hyperdb instance.*
+
+Emitted exactly once: when the db is fully ready and all static properties have
+been set. You do not need to wait for this when calling any async functions.
+
+#### `db.on('error', err)`
+
+*This event is passed on from underlying hyperdb instance.*
+
+Emitted if there was a critical error before `db` is ready.
 
 #### `db.put(triple, [callback])`
 

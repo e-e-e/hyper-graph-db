@@ -3,7 +3,6 @@
 const expect = require('chai').expect
 const ram = require('random-access-memory')
 const hypergraph = require('../index')
-const hyperdb = require('hyperdb')
 const fixture = require('./fixture/foaf')
 
 function ramStore (filename) {
@@ -16,7 +15,7 @@ function ramStore (filename) {
 describe('JoinStream', () => {
   let db
   beforeEach((done) => {
-    db = hypergraph(hyperdb(ramStore))
+    db = hypergraph(ramStore)
     db.put(fixture, done)
   })
 

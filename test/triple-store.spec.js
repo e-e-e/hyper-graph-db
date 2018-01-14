@@ -2,7 +2,6 @@
 const expect = require('chai').expect
 const ram = require('random-access-memory')
 const hypergraph = require('../index')
-const hyperdb = require('hyperdb')
 
 function ramStore (filename) {
    // filename will be one of: data, bitfield, tree, signatures, key, secret_key
@@ -13,11 +12,9 @@ function ramStore (filename) {
 
 describe('a basic triple store', function () {
   let db
-  let hyper
 
   beforeEach(function () {
-    hyper = hyperdb(ramStore)
-    db = hypergraph(hyper)
+    db = hypergraph(ramStore)
   })
 
   afterEach(function (done) {
@@ -209,7 +206,8 @@ describe('a basic triple store', function () {
   it('should put a triple with an object to false', function (done) {
     var t = { subject: 'a', predicate: 'b', object: false }
     db.put(t, function () {
-      hyper.get('spo::a::b::false', done)
+      // accessing underlying db instance
+      db.db.get('spo/a/b/false', done)
     })
   })
 
@@ -598,7 +596,7 @@ describe('deferred open support', function () {
   })
 
   it('should support deferred search', function (done) {
-    db = hypergraph(hyperdb(ramStore))
+    db = hypergraph(ramStore)
     db.search([{ predicate: 'likes' }], function () {
       done()
     })
@@ -607,11 +605,9 @@ describe('deferred open support', function () {
 
 describe('generateBatch', function () {
   var db
-  var hyper
 
   beforeEach(function () {
-    hyper = hyperdb(ramStore)
-    db = hypergraph(hyper)
+    db = hypergraph(ramStore)
   })
 
   afterEach(function (done) {
