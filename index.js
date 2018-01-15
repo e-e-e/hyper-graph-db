@@ -3,6 +3,7 @@ const stream = require('readable-stream')
 const pump = require('pump')
 const inherits = require('inherits')
 const events = require('events')
+const SparqlIterator = require('sparql-iterator')
 
 const utils = require('./lib/utils')
 const Variable = require('./lib/Variable')
@@ -120,6 +121,14 @@ Graph.prototype.search = function (query, options, callback) {
     options = undefined
   }
   utils.collect(this.searchStream(query, options), callback)
+}
+
+Graph.prototype.queryStream = function (query) {
+  return new SparqlIterator(query, { hypergraph: this })
+}
+
+Graph.prototype.query = function (query, callback) {
+  utils.collect(this.queryStream(query), callback)
 }
 
 Graph.prototype.generateBatch = utils.generateBatch

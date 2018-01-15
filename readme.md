@@ -95,10 +95,21 @@ Allowed options:
 }
 ```
 
-#### `db.search(queries, [options], callback)`
+#### `db.query(query, callback)`
 
-Allows for Basic Graph Patterns searches where all queries must match.
-Expects queries to be an array of triple options of the form:
+Allows for querying the graph with [SPARQL](https://www.w3.org/TR/sparql11-protocol/) queries.
+Returns all entries that match the query.
+
+SPARQL queries are implemented using [sparql-iterator](https://github.com/e-e-e/sparql-iterator) - a fork of [Linked Data Fragments Client](https://github.com/LinkedDataFragments/Client.js).
+
+#### `var stream = db.queryStream(query)`
+
+Returns a stream of results from the SPARQL query.
+
+#### `db.search(patterns, [options], callback)`
+
+Allows for Basic Graph Patterns searches where all patterns must match.
+Expects patterns to be an array of triple options of the form:
 
 ```js
 {
