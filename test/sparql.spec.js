@@ -13,6 +13,7 @@ function ramStore () { return ram() }
 function importTurtleFile (graph, file, callback) {
   var parser = N3.StreamParser()
   var writer = graph.putStream()
+  N3.Parser._resetBlankNodeIds()
   fs.createReadStream(file).pipe(parser).pipe(writer)
   writer.on('end', callback)
   writer.on('error', callback)
@@ -20,14 +21,11 @@ function importTurtleFile (graph, file, callback) {
 
 function testQuery (graph, queryFile, expected, done) {
   var query = fs.readFileSync(queryFile)
-  console.time('query')
   var s = graph.queryStream(query.toString())
   s.on('data', (d) => {
-    // console.log(d);
     expect(d).to.deep.equal(expected.shift())
   })
   s.on('end', () => {
-    console.timeEnd('query')
     expect(expected).to.have.length(0)
     done()
   })
@@ -44,10 +42,10 @@ describe('hypergraph.queryStream', () => {
       })
     })
 
-    it('runs ok', (done) => {
+    it('performs CONSTRUCT query type with UNION operator', (done) => {
       console.time('query')
       var expected = [
-        { subject: '_:b0_b',
+        { subject: 'hypergraph:b0_b',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b0' },
         { subject: '_:b0',
@@ -56,7 +54,7 @@ describe('hypergraph.queryStream', () => {
         { subject: '_:b0',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#familyName',
           object: '"Hacker"' },
-        { subject: '_:b0_a',
+        { subject: 'hypergraph:b0_a',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b1' },
         { subject: '_:b1',
