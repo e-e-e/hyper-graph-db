@@ -13,7 +13,7 @@
   "dependencies": {
     "hyperdb": "^2.0.0",
     "lru": "^3.1.0",
-    "pump": "^2.0.0",
+    "pump": "^3.0.0",
     "readable-stream": "^2.3.3",
     "sparql-iterator": "^2.0.5"
   },
