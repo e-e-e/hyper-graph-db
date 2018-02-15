@@ -45,7 +45,7 @@ describe('hypergraph.queryStream', () => {
     it('performs CONSTRUCT query type with UNION operator', (done) => {
       console.time('query')
       var expected = [
-        { subject: 'hg:b0_b',
+        { subject: 'hg://b0_b',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b0' },
         { subject: '_:b0',
@@ -54,7 +54,7 @@ describe('hypergraph.queryStream', () => {
         { subject: '_:b0',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#familyName',
           object: '"Hacker"' },
-        { subject: 'hg:b0_a',
+        { subject: 'hg://b0_a',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b1' },
         { subject: '_:b1',

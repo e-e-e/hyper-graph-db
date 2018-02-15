@@ -6,6 +6,7 @@ const events = require('events')
 const SparqlIterator = require('sparql-iterator')
 
 const utils = require('./lib/utils')
+const prefixes = require('./lib/prefixes')
 const Variable = require('./lib/Variable')
 const HyperdbReadTransform = require('./lib/HyperdbReadTransform')
 const JoinStream = require('./lib/JoinStream')
@@ -36,6 +37,24 @@ function Graph (storage, key, opts) {
 inherits(Graph, events.EventEmitter)
 
 Graph.prototype.v = (name) => new Variable(name)
+
+Graph.prototype.prefixes = function (callback) {
+  // should cache this somehow
+  const prefixStream = this.db.createReadStream(prefixes.PREFIX_KEY)
+  utils.collect(prefixStream, (err, data) => {
+    if (err) return callback(err)
+    var names = data.reduce((p, nodes) => {
+      var data = prefixes.fromNodes(nodes)
+      p[data.prefix] = data.uri
+      return p
+    }, {})
+    callback(null, names)
+  })
+}
+
+Graph.prototype.addPrefix = function (prefix, uri, cb) {
+  this.db.put(prefixes.toKey(prefix), uri, cb)
+}
 
 Graph.prototype.getStream = function (triple, opts) {
   const stream = this.db.createReadStream(utils.createQuery(triple))
