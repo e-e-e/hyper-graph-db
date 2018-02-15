@@ -5,6 +5,7 @@ const inherits = require('inherits')
 const events = require('events')
 const SparqlIterator = require('sparql-iterator')
 
+const constants = require('./lib/constants')
 const utils = require('./lib/utils')
 const prefixes = require('./lib/prefixes')
 const Variable = require('./lib/Variable')
@@ -26,11 +27,19 @@ function Graph (storage, key, opts) {
   events.EventEmitter.call(this)
   this.db = hyperdb(storage, key, opts)
 
+  // what are the default prefixes
+  this._prefixes = constants.DEFAULT_PREFIXES
+  this._indexes = (opts && opts.index === 'small')
+    ? constants.HEXSTORE_INDEXES_REDUCED
+    : constants.HEXSTORE_INDEXES
+  this._indexKeys = Object.keys(this._indexes)
+
   this.db.on('error', (e) => {
     this.emit('error', e)
   })
   this.db.on('ready', (e) => {
     this.emit('ready', e)
+    // check prefixes
   })
 }
 
@@ -38,9 +47,9 @@ inherits(Graph, events.EventEmitter)
 
 Graph.prototype.v = (name) => new Variable(name)
 
-Graph.prototype.prefixes = function (callback) {
+Graph.prototype.listPrefixes = function (callback) {
   // should cache this somehow
-  const prefixStream = this.db.createReadStream(prefixes.PREFIX_KEY)
+  const prefixStream = this.db.createReadStream(constants.PREFIX_KEY)
   utils.collect(prefixStream, (err, data) => {
     if (err) return callback(err)
     var names = data.reduce((p, nodes) => {
@@ -57,8 +66,8 @@ Graph.prototype.addPrefix = function (prefix, uri, cb) {
 }
 
 Graph.prototype.getStream = function (triple, opts) {
-  const stream = this.db.createReadStream(utils.createQuery(triple))
-  return stream.pipe(new HyperdbReadTransform(this.db, opts))
+  const stream = this.db.createReadStream(this._createQuery(triple))
+  return stream.pipe(new HyperdbReadTransform(this.db, this._prefixes, opts))
 }
 
 Graph.prototype.get = function (triple, opts, callback) {
@@ -71,7 +80,7 @@ function doAction (action) {
     if (!triples) return callback(new Error('Must pass triple'))
     let entries = (!triples.reduce) ? [triples] : triples
     entries = entries.reduce((prev, triple) => {
-      return prev.concat(this.generateBatch(triple, action))
+      return prev.concat(this._generateBatch(triple, action))
     }, [])
     this.db.batch(entries.reverse(), callback)
   }
@@ -79,13 +88,14 @@ function doAction (action) {
 
 function doActionStream (action) {
   return function () {
+    const self = this
     const transform = new Transform({
       objectMode: true,
       transform (triples, encoding, done) {
         if (!triples) return done()
         let entries = (!triples.reduce) ? [triples] : triples
         entries = entries.reduce((prev, triple) => {
-          return prev.concat(utils.generateBatch(triple, action))
+          return prev.concat(self._generateBatch(triple, action))
         }, [])
         this.push(entries.reverse())
         done()
@@ -150,10 +160,64 @@ Graph.prototype.query = function (query, callback) {
   utils.collect(this.queryStream(query), callback)
 }
 
-Graph.prototype.generateBatch = utils.generateBatch
-
 Graph.prototype.close = function (callback) {
   callback()
+}
+
+/* PRIVATE FUNCTIONS */
+
+Graph.prototype._generateBatch = function (triple, action) {
+  if (!action) action = 'put'
+  var data = null
+  if (action === 'put') {
+    data = JSON.stringify(utils.extraDataMask(triple))
+  }
+  return this._encodeKeys(triple).map(key => ({
+    type: 'put', // no delete in hyperdb so just putting nulls
+    key: key,
+    value: data
+  }))
+}
+
+Graph.prototype._encodeKeys = function (triple) {
+  const encodedTriple = utils.encodeTriple(triple, this._prefixes)
+  return this._indexKeys.map(key => utils.encodeKey(key, encodedTriple))
+}
+
+Graph.prototype._createQuery = function (pattern, options) {
+  var types = utils.typesFromPattern(pattern)
+  var preferedIndex = options && options.index
+  var index = this._findIndex(types, preferedIndex)
+  const encodedTriple = utils.encodeTriple(pattern, this._prefixes)
+  var key = utils.encodeKey(index, encodedTriple)
+  return key
+}
+
+Graph.prototype._possibleIndexes = function (types) {
+  var result = this._indexKeys.filter((key) => {
+    var matches = 0
+    return this._indexes[key].every(function (e, i) {
+      if (types.indexOf(e) >= 0) {
+        matches++
+        return true
+      }
+      if (matches === types.length) {
+        return true
+      }
+    })
+  })
+
+  result.sort()
+
+  return result
+}
+
+Graph.prototype._findIndex = function (types, preferedIndex) {
+  var result = this._possibleIndexes(types)
+  if (preferedIndex && result.some(r => r === preferedIndex)) {
+    return preferedIndex
+  }
+  return result[0]
 }
 
 module.exports = Graph
