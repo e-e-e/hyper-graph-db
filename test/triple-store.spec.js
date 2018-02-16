@@ -635,7 +635,7 @@ describe('generateBatch', function () {
   })
   context('with index option set to small', () => {
     beforeEach(function () {
-      db = hypergraph(ramStore, null, { index: 'small' })
+      db = hypergraph(ramStore, null, { index: 'tri' })
     })
 
     afterEach(function (done) {

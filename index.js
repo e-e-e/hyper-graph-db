@@ -12,6 +12,7 @@ const Variable = require('./lib/Variable')
 const HyperdbReadTransform = require('./lib/HyperdbReadTransform')
 const JoinStream = require('./lib/JoinStream')
 const planner = require('./lib/planner')
+const pkg = require('./package.json')
 const attachCreateReadStream = require('./lib/hyperdbModifier').attachCreateReadStream
 
 const Transform = stream.Transform
@@ -25,11 +26,19 @@ if (!hyperdb.createReadStream) {
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
   events.EventEmitter.call(this)
-  this.db = hyperdb(storage, key, opts)
 
-  // what are the default prefixes
-  this._prefixes = constants.DEFAULT_PREFIXES
-  this._indexes = (opts && opts.index === 'small')
+  if (typeof key === 'string') key = Buffer.from(key, 'hex')
+
+  if (!Buffer.isBuffer(key) && !opts) {
+    opts = key
+    key = null
+  }
+
+  if (!opts) opts = {}
+  this.db = hyperdb(storage, key, opts)
+  this._prefixes = opts.prefixes || constants.DEFAULT_PREFIXES
+  this._prefixes._ = opts.base || constants.DEFAULT_BASE
+  this._indexes = opts.index === 'tri'
     ? constants.HEXSTORE_INDEXES_REDUCED
     : constants.HEXSTORE_INDEXES
   this._indexKeys = Object.keys(this._indexes)
@@ -38,12 +47,32 @@ function Graph (storage, key, opts) {
     this.emit('error', e)
   })
   this.db.on('ready', (e) => {
-    this.emit('ready', e)
-    // check prefixes
+    if (utils.isNewDatabase(this.db)) {
+      this._onNew((err) => {
+        if (err) return this.emit('error', err)
+        this.emit('ready', e)
+      })
+    } else {
+      this.emit('ready', e)
+    }
   })
 }
 
 inherits(Graph, events.EventEmitter)
+
+Graph.prototype._onNew = function (cb) {
+  const metadata = [
+    ['@version', pkg.version],
+    ['@index', Object.keys(this._indexes).length === 3 ? 'tri' : 'hex'],
+    ['@name', this._prefixes._]
+  ]
+  Object.keys(this._prefixes).forEach((key) => {
+    if (key !== '_') {
+      metadata.push([prefixes.toKey(key), this._prefixes[key]])
+    }
+  })
+  utils.put(this.db, metadata, cb)
+}
 
 Graph.prototype.v = (name) => new Variable(name)
 
@@ -206,9 +235,7 @@ Graph.prototype._possibleIndexes = function (types) {
       }
     })
   })
-
   result.sort()
-
   return result
 }
 
