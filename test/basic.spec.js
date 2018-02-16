@@ -1,6 +1,10 @@
 /* eslint-env mocha */
 const expect = require('chai').expect
 const ram = require('random-access-memory')
+const tmp = require('tmp')
+const path = require('path')
+const hyperdb = require('hyperdb')
+
 const hypergraph = require('../index')
 const constants = require('../lib/constants')
 
@@ -69,7 +73,7 @@ describe('hypergraph', function () {
       db.on('ready', () => {
         const stream = db.db.createReadStream('@prefix/')
         stream.on('data', (nodes) => {
-
+          // add test
         })
         stream.on('error', done)
         stream.on('end', () => {
@@ -79,7 +83,38 @@ describe('hypergraph', function () {
     })
   })
   context('when loading db that already exists', () => {
-    it('does not add new metadata')
+    it('does not add new metadata', (done) => {
+      tmp.dir(function (err, dir, cleanupCallback) {
+        if (err) return done(err)
+        console.log('Dir: ', dir)
+        const dbDir = path.join(dir, 'test.db')
+        // create new hyperdb
+        const hyper = hyperdb(dbDir)
+        hyper.on('ready', () => {
+          // as something so that its not an empty feed
+          hyper.put('test', 'data', (err) => {
+            if (err) return finish(err)
+            openExistingDBAsGraphDB()
+          })
+        })
+        hyper.on('error', finish)
+
+        function openExistingDBAsGraphDB () {
+          db = hypergraph(dbDir)
+          db.on('ready', () => {
+            db.db.get('@version', (err, nodes) => {
+              expect(nodes).to.eql(null)
+              done(err)
+            })
+          })
+          db.on('error', finish)
+        }
+        function finish (e) {
+          cleanupCallback()
+          done(e)
+        }
+      })
+    })
     it('overrides options with metadata set in hyperdb (index)')
     it('overrides options with metadata set in hyperdb (name)')
   })
