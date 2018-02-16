@@ -36,7 +36,7 @@ function Graph (storage, key, opts) {
 
   if (!opts) opts = {}
   this.db = hyperdb(storage, key, opts)
-  this._prefixes = opts.prefixes || constants.DEFAULT_PREFIXES
+  this._prefixes = Object.assign({}, opts.prefixes || constants.DEFAULT_PREFIXES)
   this._prefixes._ = opts.base || constants.DEFAULT_BASE
   this._indexes = opts.index === 'tri'
     ? constants.HEXSTORE_INDEXES_REDUCED

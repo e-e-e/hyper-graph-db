@@ -7,6 +7,7 @@ const hyperdb = require('hyperdb')
 
 const hypergraph = require('../index')
 const constants = require('../lib/constants')
+const prefixes = require('../lib/prefixes')
 
 function ramStore (filename) {
    // filename will be one of: data, bitfield, tree, signatures, key, secret_key
@@ -72,11 +73,44 @@ describe('hypergraph', function () {
       db = hypergraph(ramStore)
       db.on('ready', () => {
         const stream = db.db.createReadStream('@prefix/')
+        var count = 0
         stream.on('data', (nodes) => {
-          // add test
+          const prefix = prefixes.fromKey(nodes[0].key)
+          count++
+          expect(nodes[0].value.toString()).to.eql(constants.DEFAULT_PREFIXES[prefix])
         })
         stream.on('error', done)
         stream.on('end', () => {
+          expect(count).to.eql(Object.keys(constants.DEFAULT_PREFIXES).length)
+          done()
+        })
+      })
+    })
+    it('includes only specified prefixes (options.prefixes)', (done) => {
+      var customPrefixes = {
+        schema: 'http://schema.org/',
+        library: 'http://purl.org/library/',
+        void: 'http://rdfs.org/ns/void#',
+        dct: 'http://purl.org/dc/terms/',
+        rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        madsrdf: 'http://www.loc.gov/mads/rdf/v1#',
+        discovery: 'http://worldcat.org/vocab/discovery/',
+        bgn: 'http://bibliograph.net/',
+        pto: 'http://www.productontology.org/id/',
+        dc: 'http://purl.org/dc/elements/1.1/'
+      }
+      db = hypergraph(ramStore, { prefixes: customPrefixes })
+      db.on('ready', () => {
+        const stream = db.db.createReadStream('@prefix/')
+        var count = 0
+        stream.on('data', (nodes) => {
+          const prefix = prefixes.fromKey(nodes[0].key)
+          count++
+          expect(nodes[0].value.toString()).to.eql(customPrefixes[prefix])
+        })
+        stream.on('error', done)
+        stream.on('end', () => {
+          expect(count).to.eql(Object.keys(customPrefixes).length)
           done()
         })
       })
