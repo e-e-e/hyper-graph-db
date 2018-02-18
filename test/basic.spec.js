@@ -118,9 +118,8 @@ describe('hypergraph', function () {
   })
   context('when loading db that already exists', () => {
     it('does not add new metadata', (done) => {
-      tmp.dir(function (err, dir, cleanupCallback) {
+      tmp.dir({ unsafeCleanup: true }, function (err, dir, cleanupCallback) {
         if (err) return done(err)
-        console.log('Dir: ', dir)
         const dbDir = path.join(dir, 'test.db')
         // create new hyperdb
         const hyper = hyperdb(dbDir)
@@ -138,7 +137,7 @@ describe('hypergraph', function () {
           db.on('ready', () => {
             db.db.get('@version', (err, nodes) => {
               expect(nodes).to.eql(null)
-              done(err)
+              finish(err)
             })
           })
           db.on('error', finish)

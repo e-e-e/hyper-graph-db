@@ -37,7 +37,8 @@ function Graph (storage, key, opts) {
   if (!opts) opts = {}
   this.db = hyperdb(storage, key, opts)
   this._prefixes = Object.assign({}, opts.prefixes || constants.DEFAULT_PREFIXES)
-  this._prefixes._ = opts.base || constants.DEFAULT_BASE
+  this._basename = opts.base || constants.DEFAULT_BASE
+  this._prefixes._ = this._basename
   this._indexes = opts.index === 'tri'
     ? constants.HEXSTORE_INDEXES_REDUCED
     : constants.HEXSTORE_INDEXES
@@ -61,10 +62,11 @@ function Graph (storage, key, opts) {
 inherits(Graph, events.EventEmitter)
 
 Graph.prototype._onNew = function (cb) {
+  this._version = pkg.version
   const metadata = [
     ['@version', pkg.version],
     ['@index', Object.keys(this._indexes).length === 3 ? 'tri' : 'hex'],
-    ['@name', this._prefixes._]
+    ['@name', this._basename]
   ]
   Object.keys(this._prefixes).forEach((key) => {
     if (key !== '_') {
@@ -95,8 +97,8 @@ Graph.prototype.addPrefix = function (prefix, uri, cb) {
 }
 
 Graph.prototype.getStream = function (triple, opts) {
-  const stream = this.db.createReadStream(this._createQuery(triple))
-  return stream.pipe(new HyperdbReadTransform(this.db, this._prefixes, opts))
+  const stream = this.db.createReadStream(this._createQuery(triple, { encode: (!opts || opts.encode === undefined) ? true : opts.encode }))
+  return stream.pipe(new HyperdbReadTransform(this.db, this._basename, opts))
 }
 
 Graph.prototype.get = function (triple, opts, callback) {
@@ -153,8 +155,7 @@ Graph.prototype.searchStream = function (query, options) {
   } else if (!Array.isArray(query)) {
     query = [ query ]
   }
-  const plannedQuery = planner(query)
-
+  const plannedQuery = planner(query, this._prefixes)
   var streams = plannedQuery.map((triple, i) => {
     const limit = (options && i === plannedQuery.length - 1) ? options.limit : undefined
     return new JoinStream({
@@ -217,7 +218,7 @@ Graph.prototype._createQuery = function (pattern, options) {
   var types = utils.typesFromPattern(pattern)
   var preferedIndex = options && options.index
   var index = this._findIndex(types, preferedIndex)
-  const encodedTriple = utils.encodeTriple(pattern, this._prefixes)
+  const encodedTriple = utils.encodeTriple(pattern, options.encode ? this._prefixes : { _: this._basename })
   var key = utils.encodeKey(index, encodedTriple)
   return key
 }
