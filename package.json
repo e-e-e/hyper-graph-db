@@ -23,7 +23,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
     "random-access-memory": "^2.4.0",
-    "standard": "^10.0.3"
+    "standard": "^11.0.0"
   },
   "scripts": {
     "test": "mocha test/**.spec.js",
