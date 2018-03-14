@@ -17,13 +17,13 @@ describe('prefix utilities', () => {
 
   describe('fromNodes', () => {
     it('converts hyperdb nodes to prefix/uri object', () => {
-      const dummyNodes = [{ key: '@prefix/this', value: 'http://this.example.com' }]
+      const dummyNodes = [{ key: '@prefix/this', value: Buffer.from('http://this.example.com') }]
       expect(prefixes.fromNodes(dummyNodes)).to.eql({ uri: 'http://this.example.com', prefix: 'this' })
     })
     it('ignores conflicts', () => {
       const dummyNodes = [
-        { key: '@prefix/this', value: 'http://this.example.com' },
-        { key: '@prefix/this', value: 'http://conflict.example.com' }
+        { key: '@prefix/this', value: Buffer.from('http://this.example.com') },
+        { key: '@prefix/this', value: Buffer.from('http://conflict.example.com') }
       ]
       expect(prefixes.fromNodes(dummyNodes)).to.eql({ uri: 'http://this.example.com', prefix: 'this' })
     })
