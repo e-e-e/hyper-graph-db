@@ -4,6 +4,7 @@ const ram = require('random-access-memory')
 const tmp = require('tmp')
 const path = require('path')
 const hyperdb = require('hyperdb')
+const pkg = require('../package.json')
 
 const hypergraph = require('../index')
 const constants = require('../lib/constants')
@@ -60,7 +61,7 @@ describe('hypergraph', function () {
       })
     })
     it('includes name (option.name)', (done) => {
-      db = hypergraph(ramStore, { base: 'this://' })
+      db = hypergraph(ramStore, { name: 'this://' })
       db.on('ready', () => {
         db.db.get('@name', (err, node) => {
           expect(err).to.not.be.a('error')
@@ -124,7 +125,6 @@ describe('hypergraph', function () {
         // create new hyperdb
         const hyper = hyperdb(dbDir)
         hyper.on('ready', () => {
-          // as something so that its not an empty feed
           hyper.put('test', 'data', (err) => {
             if (err) return finish(err)
             openExistingDBAsGraphDB()
@@ -148,7 +148,74 @@ describe('hypergraph', function () {
         }
       })
     })
-    it('overrides options with metadata set in hyperdb (index)')
-    it('overrides options with metadata set in hyperdb (name)')
+
+    context('with graph already containing index, version, name and prefixes', () => {
+      const options = {
+        index: 'tri',
+        name: 'baseName',
+        prefixes: {
+          test: 'http://hyperreadings.info/test#',
+          xsd: 'http://www.w3.org/2001/XMLSchema#'
+        }
+      }
+      let cleanup = () => {}
+      let graphDir
+      before((done) => {
+        tmp.dir({ unsafeCleanup: true }, (err, dir, cleanupCallback) => {
+          if (err) return done(err)
+          cleanup = cleanupCallback
+          graphDir = dir
+          const graph = hypergraph(graphDir, options)
+          graph.on('ready', () => { done() })
+          graph.on('error', done)
+        })
+      })
+      after(() => {
+        cleanup()
+      })
+      it('contains version that was used to create the db', (done) => {
+        const graph = hypergraph(graphDir)
+        graph.on('ready', () => {
+          graph.graphVersion((err, version) => {
+            expect(err).to.eql(null)
+            expect(version).to.eql(pkg.version)
+            done()
+          })
+        })
+      })
+      it('overrides options with metadata set in hyperdb (index)', (done) => {
+        const graph = hypergraph(graphDir, { index: 'hex' })
+        graph.on('ready', () => {
+          graph.indexType((err, index) => {
+            expect(err).to.eql(null)
+            expect(index).to.eql(options.index)
+            done()
+          })
+        })
+      })
+      it('overrides options with metadata set in hyperdb (name)', (done) => {
+        const graph = hypergraph(graphDir, { index: 'hex', name: 'overrideMe' })
+        graph.on('ready', () => {
+          graph.name((err, name) => {
+            expect(err).to.eql(null)
+            expect(name).to.eql(options.name)
+            done()
+          })
+        })
+      })
+      it('overrides options with metadata set in hyperdb (prefix)', (done) => {
+        const prefixes = {
+          thing: 'http://some.co/thing#'
+        }
+        const graph = hypergraph(graphDir, { index: 'hex', name: 'overrideMe', prefixes })
+        graph.on('ready', () => {
+          graph.prefixes((err, prefixes) => {
+            expect(err).to.eql(null)
+            expect(prefixes).to.deep.eql(options.prefixes)
+            done()
+          })
+        })
+      })
+    })
   })
 })

@@ -37,8 +37,9 @@ function Graph (storage, key, opts) {
   if (!opts) opts = {}
   this.db = hyperdb(storage, key, opts)
   this._prefixes = Object.assign({}, opts.prefixes || constants.DEFAULT_PREFIXES)
-  this._basename = opts.base || constants.DEFAULT_BASE
+  this._basename = opts.name || constants.DEFAULT_BASE
   this._prefixes._ = this._basename
+  this._indexType = opts.index === 'tri' ? 'tri' : 'hex'
   this._indexes = opts.index === 'tri'
     ? constants.HEXSTORE_INDEXES_REDUCED
     : constants.HEXSTORE_INDEXES
@@ -54,7 +55,10 @@ function Graph (storage, key, opts) {
         this.emit('ready', e)
       })
     } else {
-      this.emit('ready', e)
+      this._onInit((err) => {
+        if (err) return this.emit('error', err)
+        this.emit('ready', e)
+      })
     }
   })
 }
@@ -65,7 +69,7 @@ Graph.prototype._onNew = function (cb) {
   this._version = pkg.version
   const metadata = [
     ['@version', pkg.version],
-    ['@index', Object.keys(this._indexes).length === 3 ? 'tri' : 'hex'],
+    ['@index', this._indexType],
     ['@name', this._basename]
   ]
   Object.keys(this._prefixes).forEach((key) => {
@@ -76,9 +80,78 @@ Graph.prototype._onNew = function (cb) {
   utils.put(this.db, metadata, cb)
 }
 
+Graph.prototype._onInit = function (cb) {
+  // get and set graph version
+  this._version = null
+  this._basename = null
+  this._indexType = null
+
+  let missing = 4
+  let error = null
+  // get and set version
+  this.graphVersion((err, version) => {
+    if (err) error = err
+    this._version = version
+    maybeDone()
+  })
+  // get and set graph name
+  this.name((err, name) => {
+    if (err) error = err
+    this._basename = name || constants.DEFAULT_BASE
+    // modify prefixes to ensure correct namespacing
+    this._prefixes._ = this._basename
+    maybeDone()
+  })
+  // get and set graph indexation
+  this.indexType((err, index) => {
+    if (err) error = err
+    this._indexType = index || 'hex'
+    this._indexes = index === 'tri'
+      ? constants.HEXSTORE_INDEXES_REDUCED
+      : constants.HEXSTORE_INDEXES
+    this._indexKeys = Object.keys(this._indexes)
+    maybeDone()
+  })
+  // get and set prefixes
+  this.prefixes((err, prefixes) => {
+    if (err) error = err
+    this._prefixes = Object.assign({ _: this._prefixes }, prefixes)
+    maybeDone()
+  })
+  function maybeDone () {
+    missing--
+    if (!missing) {
+      cb(error)
+    }
+  }
+}
+
 Graph.prototype.v = (name) => new Variable(name)
 
-Graph.prototype.listPrefixes = function (callback) {
+function returnValueAsString (cb) {
+  return (err, nodes) => {
+    if (err) return cb(err)
+    if (!nodes) return cb(null, null)
+    cb(null, nodes[0].value.toString())
+  }
+}
+
+Graph.prototype.graphVersion = function (cb) {
+  if (this._version) return cb(null, this._version)
+  this.db.get('@version', returnValueAsString(cb))
+}
+
+Graph.prototype.name = function (cb) {
+  if (this._basename) return cb(null, this._basename)
+  this.db.get('@name', returnValueAsString(cb))
+}
+
+Graph.prototype.indexType = function (cb) {
+  if (this._indexType) return cb(null, this._indexType)
+  this.db.get('@index', returnValueAsString(cb))
+}
+
+Graph.prototype.prefixes = function (callback) {
   // should cache this somehow
   const prefixStream = this.db.createReadStream(constants.PREFIX_KEY)
   utils.collect(prefixStream, (err, data) => {
