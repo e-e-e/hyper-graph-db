@@ -19,9 +19,10 @@ const Transform = stream.Transform
 const PassThrough = stream.PassThrough
 
 // temporarily augment hyperdb prototype to include createReadStream
-if (!hyperdb.createReadStream) {
-  attachCreateReadStream(hyperdb)
-}
+// if (!hyperdb.createReadStream) {
+//   console.log('USING CUSTOM createReadStream')
+//   attachCreateReadStream(hyperdb)
+// }
 
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
@@ -131,7 +132,7 @@ Graph.prototype.v = (name) => new Variable(name)
 function returnValueAsString (cb) {
   return (err, nodes) => {
     if (err) return cb(err)
-    if (!nodes) return cb(null, null)
+    if (!nodes || nodes.length === 0) return cb(null, null)
     cb(null, nodes[0].value.toString())
   }
 }

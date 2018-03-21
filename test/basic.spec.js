@@ -136,7 +136,7 @@ describe('hypergraph', function () {
           db = hypergraph(dbDir)
           db.on('ready', () => {
             db.db.get('@version', (err, nodes) => {
-              expect(nodes).to.eql(null)
+              expect(nodes).to.eql([])
               finish(err)
             })
           })
