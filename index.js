@@ -23,6 +23,7 @@ if (!hyperdb.createReadStream) {
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
   events.EventEmitter.call(this)
+  opts = opts || {}
   if (opts.db) {
     this.db = opts.db
   }
