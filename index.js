@@ -23,7 +23,13 @@ if (!hyperdb.createReadStream) {
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
   events.EventEmitter.call(this)
-  this.db = hyperdb(storage, key, opts)
+  opts = opts || {}
+  if (opts.db) {
+    this.db = opts.db
+  }
+  else {
+    this.db = hyperdb(storage, key, opts)
+  }
 
   this.db.on('error', (e) => {
     this.emit('error', e)
