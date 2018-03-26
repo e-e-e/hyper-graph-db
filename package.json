@@ -11,7 +11,7 @@
     "url": "https://github.com/e-e-e/hyper-graph-db/issues"
   },
   "dependencies": {
-    "hyperdb": "3.0.0-0",
+    "hyperdb": "3.0.0-1",
     "lru": "^3.1.0",
     "pump": "^3.0.0",
     "readable-stream": "^2.3.3",

@@ -413,13 +413,15 @@ describe('JoinStream', () => {
 
   it('should find homes in paris', (done) => {
     var paris = 'http://dbpedia.org/resource/Paris'
-    var parisians = [{
-      webid: 'http://bblfish.net/people/henry/card#me',
-      name: '"Henry Story"'
-    }, {
-      webid: 'https://my-profile.eu/people/deiu/card#me',
-      name: '"Andrei Vlad Sambra"'
-    }]
+    var parisians = [
+      {
+        webid: 'https://my-profile.eu/people/deiu/card#me',
+        name: '"Andrei Vlad Sambra"'
+      }, {
+        webid: 'http://bblfish.net/people/henry/card#me',
+        name: '"Henry Story"'
+      }
+    ]
 
     db.put(require('./fixture/homes_in_paris'), () => {
       db.search([{
