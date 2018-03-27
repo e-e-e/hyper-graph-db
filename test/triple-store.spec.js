@@ -605,32 +605,60 @@ describe('deferred open support', function () {
 
 describe('generateBatch', function () {
   var db
+  context('without index option', () => {
+    beforeEach(function () {
+      db = hypergraph(ramStore)
+    })
 
-  beforeEach(function () {
-    db = hypergraph(ramStore)
-  })
+    afterEach(function (done) {
+      db.close(done)
+    })
+    it('should generate a batch from a triple with length 6', function () {
+      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var ops = db._generateBatch(triple)
+      expect(ops).to.have.property('length', 6)
+      ops.forEach(function (op) {
+        expect(op).to.have.property('type', 'put')
+        expect(JSON.parse(op.value)).to.eql(triple)
+      })
+    })
 
-  afterEach(function (done) {
-    db.close(done)
-  })
-
-  it('should generate a batch from a triple', function () {
-    var triple = { subject: 'a', predicate: 'b', object: 'c' }
-    var ops = db.generateBatch(triple)
-    expect(ops).to.have.property('length', 6)
-    ops.forEach(function (op) {
-      expect(op).to.have.property('type', 'put')
-      expect(JSON.parse(op.value)).to.eql(triple)
+    it('should generate a batch of type', function () {
+      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var ops = db._generateBatch(triple, 'del')
+      expect(ops).to.have.property('length', 6)
+      ops.forEach(function (op) {
+        expect(op).to.have.property('type', 'put')
+        expect(JSON.parse(op.value)).to.eql(null)
+      })
     })
   })
+  context('with index option set to small', () => {
+    beforeEach(function () {
+      db = hypergraph(ramStore, null, { index: 'tri' })
+    })
 
-  it('should generate a batch of type', function () {
-    var triple = { subject: 'a', predicate: 'b', object: 'c' }
-    var ops = db.generateBatch(triple, 'del')
-    expect(ops).to.have.property('length', 6)
-    ops.forEach(function (op) {
-      expect(op).to.have.property('type', 'put')
-      expect(JSON.parse(op.value)).to.eql(null)
+    afterEach(function (done) {
+      db.close(done)
+    })
+    it('should generate a batch from a triple with length 3', function () {
+      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var ops = db._generateBatch(triple)
+      expect(ops).to.have.property('length', 3)
+      ops.forEach(function (op) {
+        expect(op).to.have.property('type', 'put')
+        expect(JSON.parse(op.value)).to.eql(triple)
+      })
+    })
+
+    it('should generate a batch of type', function () {
+      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var ops = db._generateBatch(triple, 'del')
+      expect(ops).to.have.property('length', 3)
+      ops.forEach(function (op) {
+        expect(op).to.have.property('type', 'put')
+        expect(JSON.parse(op.value)).to.eql(null)
+      })
     })
   })
 })

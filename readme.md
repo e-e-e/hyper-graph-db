@@ -39,6 +39,22 @@ db.put(triple, function (err) {
 
 Returns an instance of hyper-graph-db. Arguments are passed directly to hyperdb, look at its constructor [API](https://github.com/mafintosh/hyperdb#var-db--hyperdbstorage-key-options) for configuration options.
 
+Extra Options:
+```js
+{
+  index: 'hex' || 'tri', // 6 or 3 indices, default 'hex'
+  name: string, // name that prefixes blank nodes
+  prefixes: { // an object representing RDF namespace prefixes
+    [sorthand]: string,
+  },
+}
+```
+
+The prefix option can be used to further reduce db size, as it will auto replace namespaced values with their prefered prefix.
+
+For example: `{ vcard: 'http://www.w3.org/2006/vcard/ns#' }` will store `http://www.w3.org/2006/vcard/ns#given-name` as `vcard:given-name`.
+
+**Note:** `index`, `name`, and `prefixes` can only be set when a graph db is first created. When loading an existing graph these values are also loaded from the db.
 
 #### `db.on('ready')`
 
@@ -65,7 +81,7 @@ Returns a writable stream.
 
 Returns all entries that match the triple. This allows for partial  pattern-matching. For example `{ subject: 'a' })`, will return all triples with subject equal to 'a'.
 
-Allowed options:
+Options:
 ```js
 {
   limit: number, // limit number of triples returned
@@ -178,3 +194,20 @@ db.put([{
 #### `var stream = db.searchStream(queries)`
 
 Returns search results as a stream.
+
+#### `db.graphVersion()`
+
+Returns the version of hyper-graph-db that created the db.
+
+#### `db.indexType()`
+
+Returns the type of index which the graph is configured to use: `hex` or `tri`.
+
+#### `db.name()`
+
+Returns the name used for blank nodes when searching the db.
+
+#### `db.prefixes()`
+
+Returns an object representing the RDF prefixes used by the db.
+

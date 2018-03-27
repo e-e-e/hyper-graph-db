@@ -38,4 +38,4 @@ module.exports = [{
   subject: 'davide',
   predicate: 'age',
   object: 70
-}];
+}]

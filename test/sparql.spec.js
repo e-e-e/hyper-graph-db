@@ -45,7 +45,7 @@ describe('hypergraph.queryStream', () => {
     it('performs CONSTRUCT query type with UNION operator', (done) => {
       console.time('query')
       var expected = [
-        { subject: 'hg:b0_b',
+        { subject: 'hg://b0_b',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b0' },
         { subject: '_:b0',
@@ -54,7 +54,7 @@ describe('hypergraph.queryStream', () => {
         { subject: '_:b0',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#familyName',
           object: '"Hacker"' },
-        { subject: 'hg:b0_a',
+        { subject: 'hg://b0_a',
           predicate: 'http://www.w3.org/2001/vcard-rdf/3.0#N',
           object: '_:b1' },
         { subject: '_:b1',
@@ -79,8 +79,8 @@ describe('hypergraph.queryStream', () => {
 
     it('executes singular query selecting singular variable', (done) => {
       var expected = [
-        { '?person': 'http://www.snee.com/hr/emp2' },
-        { '?person': 'http://www.snee.com/hr/emp1' }
+        { '?person': 'http://www.snee.com/hr/emp1' },
+        { '?person': 'http://www.snee.com/hr/emp2' }
       ]
       var query = path.join(__dirname, `./queries/sparqlIn11Minutes1.rq`)
       testQuery(graph, query, expected, done)
@@ -88,10 +88,10 @@ describe('hypergraph.queryStream', () => {
 
     it('executes two queries selecting two variables', (done) => {
       var expected = [
-        { '?person': 'http://www.snee.com/hr/emp2',
-          '?givenName': '"John"' },
         { '?person': 'http://www.snee.com/hr/emp1',
-          '?givenName': '"Heidi"' }
+          '?givenName': '"Heidi"' },
+        { '?person': 'http://www.snee.com/hr/emp2',
+          '?givenName': '"John"' }
       ]
       var query = path.join(__dirname, `./queries/sparqlIn11Minutes2.rq`)
       testQuery(graph, query, expected, done)
@@ -99,18 +99,18 @@ describe('hypergraph.queryStream', () => {
 
     it('executes three queries selecting three variables', (done) => {
       var expected = [
-        { '?givenName': '"Jane"',
-          '?familyName': '"Berger"',
-          '?hireDate': '"1000-03-10"' },
         { '?givenName': '"Heidi"',
           '?familyName': '"Smith"',
           '?hireDate': '"2015-01-13"' },
-        { '?givenName': '"Francis"',
-          '?familyName': '"Jones"',
-          '?hireDate': '"2015-02-13"' },
+        { '?givenName': '"Jane"',
+          '?familyName': '"Berger"',
+          '?hireDate': '"1000-03-10"' },
         { '?givenName': '"John"',
           '?familyName': '"Smith"',
-          '?hireDate': '"2015-01-28"' }
+          '?hireDate': '"2015-01-28"' },
+        { '?givenName': '"Francis"',
+          '?familyName': '"Jones"',
+          '?hireDate': '"2015-02-13"' }
       ]
       var query = path.join(__dirname, `./queries/sparqlIn11Minutes3.rq`)
       testQuery(graph, query, expected, done)
@@ -131,10 +131,10 @@ describe('hypergraph.queryStream', () => {
         { '?givenName': '"John"',
           '?familyName': '"Smith"',
           '?oDate': '"2015-03-15"' },
-        { '?givenName': '"John"',
+        { '?givenName': '"Heidi"',
           '?familyName': '"Smith"',
           '?oDate': '"2015-01-30"' },
-        { '?givenName': '"Heidi"',
+        { '?givenName': '"John"',
           '?familyName': '"Smith"',
           '?oDate': '"2015-01-30"' }
       ]
@@ -147,13 +147,13 @@ describe('hypergraph.queryStream', () => {
         { '?givenName': '"Jane"',
           '?familyName': '"Berger"',
           '?oDate': null },
+        { '?givenName': '"Heidi"',
+          '?familyName': '"Smith"',
+          '?oDate': '"2015-01-30"' },
         { '?givenName': '"John"',
           '?familyName': '"Smith"',
           '?oDate': '"2015-03-15"' },
         { '?givenName': '"John"',
-          '?familyName': '"Smith"',
-          '?oDate': '"2015-01-30"' },
-        { '?givenName': '"Heidi"',
           '?familyName': '"Smith"',
           '?oDate': '"2015-01-30"' },
         { '?givenName': '"Francis"',
