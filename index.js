@@ -13,16 +13,9 @@ const HyperdbReadTransform = require('./lib/HyperdbReadTransform')
 const JoinStream = require('./lib/JoinStream')
 const planner = require('./lib/planner')
 const pkg = require('./package.json')
-const attachCreateReadStream = require('./lib/hyperdbModifier').attachCreateReadStream
 
 const Transform = stream.Transform
 const PassThrough = stream.PassThrough
-
-// temporarily augment hyperdb prototype to include createReadStream
-// if (!hyperdb.createReadStream) {
-//   console.log('USING CUSTOM createReadStream')
-//   attachCreateReadStream(hyperdb)
-// }
 
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
