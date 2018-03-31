@@ -19,6 +19,15 @@ function ramStore (filename) {
 
 describe('hypergraph', function () {
   let db
+  describe('constructor storage argument', () => {
+    context('with instance of hyperdb', () => {
+      it('sets graph database to hyperdb passed into the constructor', () => {
+        var hyperdbInstance = hyperdb(ramStore)
+        db = hypergraph(hyperdbInstance)
+        expect(db.db).to.eql(hyperdbInstance)
+      })
+    })
+  })
   context('when newly created it adds metadata to db', () => {
     it('includes graph version', (done) => {
       db = hypergraph(ramStore)

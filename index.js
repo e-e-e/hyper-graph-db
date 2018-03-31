@@ -28,7 +28,7 @@ function Graph (storage, key, opts) {
   }
 
   opts = opts || {}
-  this.db = hyperdb(storage, key, opts)
+  this.db = (storage instanceof hyperdb) ? storage : hyperdb(storage, key, opts)
   this._prefixes = Object.assign({}, opts.prefixes || constants.DEFAULT_PREFIXES)
   this._basename = opts.name || constants.DEFAULT_BASE
   this._prefixes._ = this._basename
