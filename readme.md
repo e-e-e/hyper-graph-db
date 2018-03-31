@@ -39,6 +39,8 @@ db.put(triple, function (err) {
 
 Returns an instance of hyper-graph-db. Arguments are passed directly to hyperdb, look at its constructor [API](https://github.com/mafintosh/hyperdb#var-db--hyperdbstorage-key-options) for configuration options.
 
+Storage argument can be a Hyperdb instance, a filepath, or a storage object. For an example of storage type objects look at [dat-storage](https://github.com/datproject/dat-storage).
+
 Extra Options:
 ```js
 {

@@ -20,7 +20,6 @@ const PassThrough = stream.PassThrough
 function Graph (storage, key, opts) {
   if (!(this instanceof Graph)) return new Graph(storage, key, opts)
   events.EventEmitter.call(this)
-
   if (typeof key === 'string') key = Buffer.from(key, 'hex')
 
   if (!Buffer.isBuffer(key) && !opts) {
@@ -28,8 +27,8 @@ function Graph (storage, key, opts) {
     key = null
   }
 
-  if (!opts) opts = {}
-  this.db = hyperdb(storage, key, opts)
+  opts = opts || {}
+  this.db = (storage instanceof hyperdb) ? storage : hyperdb(storage, key, opts)
   this._prefixes = Object.assign({}, opts.prefixes || constants.DEFAULT_PREFIXES)
   this._basename = opts.name || constants.DEFAULT_BASE
   this._prefixes._ = this._basename
