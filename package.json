@@ -23,9 +23,10 @@
     "coveralls": "^3.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
+    "n3": "^0.8.5",
     "random-access-memory": "^2.4.0",
-    "tmp": "0.0.33",
-    "standard": "^11.0.0"
+    "standard": "^11.0.0",
+    "tmp": "0.0.33"
   },
   "scripts": {
     "test": "mocha test/**.spec.js",
