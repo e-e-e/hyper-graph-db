@@ -1,6 +1,6 @@
 {
   "name": "hyper-graph-db",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A distributed graph database built upon hyperdb.",
   "main": "index.js",
   "repository": {
