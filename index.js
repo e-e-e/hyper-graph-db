@@ -108,7 +108,7 @@ Graph.prototype._onInit = function (cb) {
   // get and set prefixes
   this.prefixes((err, prefixes) => {
     if (err) error = err
-    this._prefixes = Object.assign({ _: this._prefixes }, prefixes)
+    this._prefixes = Object.assign({ _: this._basename }, prefixes)
     maybeDone()
   })
   function maybeDone () {

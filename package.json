@@ -1,6 +1,6 @@
 {
   "name": "hyper-graph-db",
-  "version": "0.3.1",
+  "version": "0.3.4",
   "description": "A distributed graph database built upon hyperdb.",
   "main": "index.js",
   "repository": {
@@ -11,7 +11,8 @@
     "url": "https://github.com/e-e-e/hyper-graph-db/issues"
   },
   "dependencies": {
-    "hyperdb": "3.0.0-1",
+    "hyperdb": "^3.1.0",
+    "inherits": "^2.0.3",
     "lru": "^3.1.0",
     "pump": "^3.0.0",
     "readable-stream": "^2.3.3",
@@ -22,9 +23,10 @@
     "coveralls": "^3.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
+    "n3": "^0.8.5",
     "random-access-memory": "^3.0.0",
-    "tmp": "0.0.33",
-    "standard": "^11.0.0"
+    "standard": "^11.0.0",
+    "tmp": "0.0.33"
   },
   "scripts": {
     "test": "mocha test/**.spec.js",
