@@ -628,7 +628,7 @@ describe('generateBatch', function () {
       var ops = db._generateBatch(triple, 'del')
       expect(ops).to.have.property('length', 6)
       ops.forEach(function (op) {
-        expect(op).to.have.property('type', 'put')
+        expect(op).to.have.property('type', 'del')
         expect(JSON.parse(op.value)).to.eql(null)
       })
     })
@@ -656,7 +656,7 @@ describe('generateBatch', function () {
       var ops = db._generateBatch(triple, 'del')
       expect(ops).to.have.property('length', 3)
       ops.forEach(function (op) {
-        expect(op).to.have.property('type', 'put')
+        expect(op).to.have.property('type', 'del')
         expect(JSON.parse(op.value)).to.eql(null)
       })
     })
