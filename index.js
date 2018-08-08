@@ -269,7 +269,7 @@ Graph.prototype._generateBatch = function (triple, action) {
     data = JSON.stringify(utils.extraDataMask(triple))
   }
   return this._encodeKeys(triple).map(key => ({
-    type: 'put', // no delete in hyperdb so just putting nulls
+    type: action,
     key: key,
     value: data
   }))
