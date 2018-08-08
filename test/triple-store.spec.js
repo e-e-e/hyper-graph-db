@@ -614,12 +614,12 @@ describe('generateBatch', function () {
       db.close(done)
     })
     it('should generate a batch from a triple with length 6', function () {
-      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var triple = { subject: 'a', predicate: 'b', object: 'c', extra: 'data' }
       var ops = db._generateBatch(triple)
       expect(ops).to.have.property('length', 6)
       ops.forEach(function (op) {
         expect(op).to.have.property('type', 'put')
-        expect(JSON.parse(op.value)).to.eql(triple)
+        expect(JSON.parse(op.value)).to.eql({ extra: 'data' })
       })
     })
 
@@ -642,17 +642,17 @@ describe('generateBatch', function () {
       db.close(done)
     })
     it('should generate a batch from a triple with length 3', function () {
-      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var triple = { subject: 'a', predicate: 'b', object: 'c', other: 'stuff' }
       var ops = db._generateBatch(triple)
       expect(ops).to.have.property('length', 3)
       ops.forEach(function (op) {
         expect(op).to.have.property('type', 'put')
-        expect(JSON.parse(op.value)).to.eql(triple)
+        expect(JSON.parse(op.value)).to.eql({ other: 'stuff' })
       })
     })
 
     it('should generate a batch of type', function () {
-      var triple = { subject: 'a', predicate: 'b', object: 'c' }
+      var triple = { subject: 'a', predicate: 'b', object: 'c', other: 'stuff' }
       var ops = db._generateBatch(triple, 'del')
       expect(ops).to.have.property('length', 3)
       ops.forEach(function (op) {
