@@ -6,9 +6,9 @@ const hypergraph = require('../index')
 const fixture = require('./fixture/foaf')
 
 function ramStore (filename) {
-   // filename will be one of: data, bitfield, tree, signatures, key, secret_key
-   // the data file will contain all your data concattenated.
-   // just store all files in ram by returning a random-access-memory instance
+  // filename will be one of: data, bitfield, tree, signatures, key, secret_key
+  // the data file will contain all your data concattenated.
+  // just store all files in ram by returning a random-access-memory instance
   return ram()
 }
 

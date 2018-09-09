@@ -4,9 +4,9 @@ const ram = require('random-access-memory')
 const hypergraph = require('../index')
 
 function ramStore (filename) {
-   // filename will be one of: data, bitfield, tree, signatures, key, secret_key
-   // the data file will contain all your data concattenated.
-   // just store all files in ram by returning a random-access-memory instance
+  // filename will be one of: data, bitfield, tree, signatures, key, secret_key
+  // the data file will contain all your data concattenated.
+  // just store all files in ram by returning a random-access-memory instance
   return ram()
 }
 
@@ -85,14 +85,14 @@ describe('a basic triple store', function () {
 
     ['subject', 'predicate', 'object'].forEach(function (type) {
       it('should get nothing if nothing matches an only ' + type + ' query',
-         function (done) {
-           var query = {}
-           query[type] = 'notfound'
-           db.get(query, (err, list) => {
-             expect(list).to.eql([])
-             done(err)
-           })
-         })
+        function (done) {
+          var query = {}
+          query[type] = 'notfound'
+          db.get(query, (err, list) => {
+            expect(list).to.eql([])
+            done(err)
+          })
+        })
     })
 
     it('should return the triple through the getStream interface', function (done) {
@@ -160,30 +160,30 @@ describe('a basic triple store', function () {
 
   describe('with special characters', function () {
     it('should support string contain ::', function (done) {
-      var t1 = {subject: 'a', predicate: 'b', object: 'c'}
-      var t2 = {subject: 'a::a::a', predicate: 'b', object: 'c'}
+      var t1 = { subject: 'a', predicate: 'b', object: 'c' }
+      var t2 = { subject: 'a::a::a', predicate: 'b', object: 'c' }
       db.put([t1, t2], function () {
-        db.get({subject: 'a'}, (err, values) => {
+        db.get({ subject: 'a' }, (err, values) => {
           expect(values).to.have.lengthOf(1)
           done(err)
         })
       })
     })
     it('should support string contain \\::', function (done) {
-      var t1 = {subject: 'a', predicate: 'b', object: 'c'}
-      var t2 = {subject: 'a\\::a', predicate: 'b', object: 'c'}
+      var t1 = { subject: 'a', predicate: 'b', object: 'c' }
+      var t2 = { subject: 'a\\::a', predicate: 'b', object: 'c' }
       db.put([t1, t2], function () {
-        db.get({subject: 'a'}, (err, values) => {
+        db.get({ subject: 'a' }, (err, values) => {
           expect(values).to.have.lengthOf(1)
           done(err)
         })
       })
     })
     it('should support string end with :', function (done) {
-      var t1 = {subject: 'a', predicate: 'b', object: 'c'}
-      var t2 = {subject: 'a:', predicate: 'b', object: 'c'}
+      var t1 = { subject: 'a', predicate: 'b', object: 'c' }
+      var t2 = { subject: 'a:', predicate: 'b', object: 'c' }
       db.put([t1, t2], function () {
-        db.get({subject: 'a:'}, (err, values) => {
+        db.get({ subject: 'a:' }, (err, values) => {
           expect(values).to.have.lengthOf(1)
           expect(values[0].subject).to.equal('a:')
           done(err)
@@ -191,10 +191,10 @@ describe('a basic triple store', function () {
       })
     })
     it('should support string end with \\', function (done) {
-      var t1 = {subject: 'a', predicate: 'b', object: 'c'}
-      var t2 = {subject: 'a\\', predicate: 'b', object: 'c'}
+      var t1 = { subject: 'a', predicate: 'b', object: 'c' }
+      var t2 = { subject: 'a\\', predicate: 'b', object: 'c' }
       db.put([t1, t2], function () {
-        db.get({subject: 'a\\'}, (err, values) => {
+        db.get({ subject: 'a\\' }, (err, values) => {
           expect(values).to.have.lengthOf(1)
           expect(values[0].subject).to.equal('a\\')
           done(err)
@@ -366,7 +366,7 @@ describe('a basic triple store', function () {
     })
 
     it('should get one by specifiying the exact triple', function (done) {
-      db.get({subject: 'a', predicate: 'b', object: 'c'}, (err, list) => {
+      db.get({ subject: 'a', predicate: 'b', object: 'c' }, (err, list) => {
         expect(list).to.eql([triple1])
         done(err)
       })
