@@ -6,6 +6,12 @@ node_js:
   - 9
   - 10
 script:
-  - npm run travis
-after_script:
-  - npm run report-coverage
+  - npm run lint
+  - npm run test
+jobs:
+  include:
+    - stage: coverage
+      node_js: 8
+      script: npm run travis
+      after_script:
+        - npm run report-coverage
