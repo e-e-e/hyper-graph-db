@@ -5,13 +5,15 @@ node_js:
   - 8
   - 9
   - 10
+script:
+  - npm run test
 jobs:
   include:
     - stage: lint
       node_js: 8
       script: npm run lint
-    - stage: test
-      script:
-        - npm run travis
+    - stage: coverage
+      node_js: 8
+      script: npm run travis
       after_script:
         - npm run report-coverage
