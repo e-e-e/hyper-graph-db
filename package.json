@@ -15,7 +15,7 @@
     "inherits": "^2.0.3",
     "lru": "^3.1.0",
     "pump": "^3.0.0",
-    "readable-stream": "^3.0.1",
+    "readable-stream": "^3.0.3",
     "sparql-iterator": "^2.0.5",
     "thunky": "^1.0.2"
   },
